@@ -37,8 +37,8 @@ struct node* searchNode(int);
 struct node** parentChildCheck(struct node*);
 void leftRotation(struct node *);
 void rightRotation(struct node *);
-void insertFixUp();
-void deleteFixUp();
+void insertFixUp(struct node*);
+void deleteFixUp(struct node*);
 void levelOrderTraversal();
 
 int main(){
@@ -50,8 +50,8 @@ int main(){
 	insertNode(4, "nic2223k");
 	insertNode(1, "ni34ck");
 	insertNode(13, "ytyty77");
-	leftRotation(root);
-	deleteNode(10);
+	//rightRotation(root);
+	//deleteNode(10);
 	levelOrderTraversal();
 	//printf("%s\n", searchNode(10)->data);
 	//printf("%ld\n", (root->right_child));
@@ -61,6 +61,62 @@ int main(){
 	printf("%ld\n", root);
 	return 0;
 }
+
+void insertFixUp(struct node* current){
+	struct node* parent = current->parent;
+	struct node* uncle = NULL;
+	struct node* grand_parent = parent->parent;
+	while(parent->color == COLOR_RED){
+
+		if (parent == parent->parent->left_child){
+			uncle = parent->parent->right_child;
+
+			if (uncle->color == COLOR_RED){
+				parent->color = COLOR_BLACK;
+				uncle->color = COLOR_BLACK;
+				grand_parent->color = COLOR_RED;
+				current = grand_parent;
+			}
+			else{
+				if(current == parent->right_child){
+					current = parent;
+					leftRotation(current);
+				}
+				parent->color = COLOR_BLACK;
+				grand_parent->color = COLOR_RED;
+				rightRotation(grand_parent);
+			}
+		}
+		else{
+			uncle = parent->parent->left_child;
+			if (uncle->color == COLOR_RED){
+				parent->color = COLOR_BLACK;
+				uncle->color = COLOR_BLACK;
+				grand_parent->color = COLOR_RED;
+				current = grand_parent;
+			}
+			else{
+				if (current = parent->left_child){
+					current = parent;
+					rightRotation(current);
+				}
+				parent->color = COLOR_BLACK;
+				grand_parent->color = COLOR_RED;
+				leftRotation(grand_parent);
+			}
+		}
+
+		parent = current->parent;
+		grand_parent = parent->parent;
+	}	
+	root->color = COLOR_BLACK;
+}
+
+void deleteFixUp(struct node* current){
+
+	root->color = COLOR_BLACK;
+}
+
 struct node** parentChildCheck(struct node* current){
 	struct node* parent = NULL;
 	if (current == root)
@@ -76,8 +132,10 @@ int insertNode(int key, char* data){
 	struct node* new_node = (struct node*)malloc(sizeof(struct node));
 	struct node* current = NULL;
 	struct node* next_node = NULL;
-	if (root == &nil)
+	if (root == &nil){
 		root = new_node;
+		new_node->parent = &nil;
+	}
 	else{
 		next_node = root;
 		while(next_node != &nil){
@@ -97,13 +155,14 @@ int insertNode(int key, char* data){
 		else
 			current->left_child = new_node;
 
-
 	}
+
+	new_node->color = COLOR_RED;
 	new_node->key = key;
 	new_node->data = data;
-	new_node->color = COLOR_RED;
 	new_node->left_child = &nil;
 	new_node->right_child = &nil;
+	insertFixUp(new_node);
 	return 0;
 }
 
@@ -130,18 +189,17 @@ int deleteNode(int key){
 		}
 		else if (left_child != &nil){
 			*parentChildCheck(del_node) = left_child;
-			left_child->parent = (del_node != root)?del_node->parent:NULL;
+			left_child->parent = del_node->parent;
 		}
 		else if (right_child != &nil){
 			*parentChildCheck(del_node) = right_child;
-			right_child->parent = (del_node != root)?del_node->parent:NULL;
+			right_child->parent = del_node->parent;
 		}
 		else{
 			*parentChildCheck(del_node) = &nil;
 		}
 
 		free(del_node);
-
 	}
 	else{
 
@@ -194,14 +252,26 @@ void leftRotation(struct node *current){
 }
 
 void rightRotation(struct node *current){
+	struct node* left_child = current->left_child;
+	struct node* left_right_child = left_child->right_child;
 
+	left_child->parent = (current!=root)?current->parent:NULL;
+	*parentChildCheck(current) = left_child;
+	left_right_child->parent = current;
+	left_child->right_child = current;
+	current->parent = left_child;
+	current->left_child = left_right_child;
 }
 
 void levelOrderTraversal(){
 	struct node *current = NULL;
 	enqueue(root);
 	while(dequeue(&current)){
-		printf("(%d):%s\n", current->key, current->data);
+		printf("(%d)%s:%c", current->key, current->data, current->color);
+		if (current->parent != NULL)
+			printf("-%d\n", current->parent->key);
+		else
+			printf("\n");
 		if (current->left_child != &nil)
 			enqueue(current->left_child);
 		if (current->right_child != &nil)
