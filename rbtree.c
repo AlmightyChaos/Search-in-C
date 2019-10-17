@@ -57,8 +57,8 @@ int main(){
 	//printf("%ld\n", (root->right_child));
 	//printf("%ld\n", *(struct node **)((void*)root+24));
 	//*(struct node**)((void*)root+24) = root;
-	printf("%ld\n", *parentChildCheck(root));
-	printf("%ld\n", root);
+	//printf("%ld\n", *parentChildCheck(root));
+	//printf("%ld\n", root);
 	return 0;
 }
 
@@ -243,7 +243,7 @@ void leftRotation(struct node *current){
 	 root = right_child;
 	 }
 	 */
-	right_child->parent = (current!=root)?current->parent:NULL;
+	right_child->parent = current->parent;
 	*parentChildCheck(current) = right_child;
 	right_left_child->parent = current;
 	right_child->left_child = current;
@@ -255,7 +255,7 @@ void rightRotation(struct node *current){
 	struct node* left_child = current->left_child;
 	struct node* left_right_child = left_child->right_child;
 
-	left_child->parent = (current!=root)?current->parent:NULL;
+	left_child->parent = current->parent;
 	*parentChildCheck(current) = left_child;
 	left_right_child->parent = current;
 	left_child->right_child = current;
