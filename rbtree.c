@@ -51,7 +51,7 @@ int main(){
 	insertNode(1, "ni34ck");
 	insertNode(13, "ytyty77");
 	//rightRotation(root);
-	//deleteNode(10);
+	deleteNode(13);
 	levelOrderTraversal();
 	//printf("%s\n", searchNode(10)->data);
 	//printf("%ld\n", (root->right_child));
@@ -113,8 +113,64 @@ void insertFixUp(struct node* current){
 }
 
 void deleteFixUp(struct node* current){
+	struct node* sibling = NULL;
+	while(current != root && current->color != COLOR_RED){
+		if (current == current->parent->left_child){
+			sibling = current->parent->right_child;
+			if (sibling->color == COLOR_RED){
+				sibling->color = COLOR_BLACK;
+				current->parent->color = COLOR_RED;
+				leftRotation(current->parent);
+				sibling = current->parent->right_child;
+			}
+			if (sibling->right_child->color == COLOR_BLACK && sibling->left_child->color == COLOR_BLACK){
+				sibling->color = COLOR_RED;
+				current = current->parent;
+			}
+			else{
+				if(sibling->left_child->color == COLOR_RED){
+					sibling->left_child->color = COLOR_BLACK;
+					sibling->color = COLOR_RED;
+					rightRotation(sibling);
+					sibling = current->parent->right_child;
+				}
+				sibling->color = current->parent->color;
+				current->parent->color = COLOR_BLACK;
+				sibling->right_child->color = COLOR_BLACK;
+				leftRotation(current->parent);
+				current = root;
+			}
+		}
 
-	root->color = COLOR_BLACK;
+
+		else{
+			sibling = current->parent->left_child;
+			if (sibling->color == COLOR_RED){
+				sibling->color = COLOR_BLACK;
+				current->parent->color = COLOR_RED;
+				rightRotation(current->parent);
+				sibling = current->parent->left_child;
+			}
+			if (sibling->right_child->color == COLOR_BLACK && sibling->left_child->color == COLOR_BLACK){
+				sibling->color = COLOR_RED;
+				current = current->parent;
+			}
+			else{
+				if(sibling->right_child->color == COLOR_RED){
+					sibling->right_child->color = COLOR_BLACK;
+					sibling->color = COLOR_RED;
+					leftRotation(sibling);
+					sibling = current->parent->left_child;
+				}
+				sibling->color = current->parent->color;
+				current->parent->color = COLOR_BLACK;
+				sibling->left_child->color = COLOR_BLACK;
+				rightRotation(current->parent);
+				current = root;
+			}
+		}
+	}
+	current->color = COLOR_BLACK;
 }
 
 struct node** parentChildCheck(struct node* current){
@@ -168,6 +224,7 @@ int insertNode(int key, char* data){
 
 int deleteNode(int key){
 	struct node* del_node = searchNode(key);
+	struct node* fetch_up = &nil;
 	struct node* left_child = del_node->left_child;
 	struct node* right_child = del_node->right_child;
 
@@ -186,18 +243,24 @@ int deleteNode(int key){
 			right_child->right_child->parent = right_child->parent;
 			//Exchange and let the substitute go to hell.
 			del_node = right_child;
+			fetch_up = right_child->right_child;
 		}
 		else if (left_child != &nil){
 			*parentChildCheck(del_node) = left_child;
 			left_child->parent = del_node->parent;
+			fetch_up = left_child;
 		}
 		else if (right_child != &nil){
 			*parentChildCheck(del_node) = right_child;
 			right_child->parent = del_node->parent;
+			fetch_up = right_child;
 		}
 		else{
 			*parentChildCheck(del_node) = &nil;
 		}
+
+		if (del_node->color == COLOR_BLACK)
+			deleteFixUp(fetch_up);
 
 		free(del_node);
 	}
@@ -206,7 +269,7 @@ int deleteNode(int key){
 		printf("The deleted node doesn't exist!\n");
 		return 1;
 	}
-
+	return 0;
 }
 struct node* searchNode(int key){
 	struct node* current = NULL;
