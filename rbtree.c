@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #define COLOR_RED 'r'
 #define COLOR_BLACK 'b'
-#define QUEUE_SIZE 10
+#define QUEUE_SIZE 1024
 
 typedef enum{
 	false = 0,
@@ -50,6 +50,9 @@ int main(){
 	insertNode(4, "nic2223k");
 	insertNode(1, "ni34ck");
 	insertNode(13, "ytyty77");
+	insertNode(7, "ytydsfs");
+	insertNode(15, "yt535sfs");
+	insertNode(14, "ytyty43");
 	//rightRotation(root);
 	deleteNode(13);
 	levelOrderTraversal();
@@ -63,51 +66,48 @@ int main(){
 }
 
 void insertFixUp(struct node* current){
-	struct node* parent = current->parent;
 	struct node* uncle = NULL;
-	struct node* grand_parent = parent->parent;
-	while(parent->color == COLOR_RED){
 
-		if (parent == parent->parent->left_child){
-			uncle = parent->parent->right_child;
+	while(current->parent->color == COLOR_RED){
+
+		if (current->parent == current->parent->parent->left_child){
+			uncle = current->parent->right_child;
 
 			if (uncle->color == COLOR_RED){
-				parent->color = COLOR_BLACK;
+				current->parent->color = COLOR_BLACK;
 				uncle->color = COLOR_BLACK;
-				grand_parent->color = COLOR_RED;
-				current = grand_parent;
+				current->parent->parent->color = COLOR_RED;
+				current = current->parent->parent;
 			}
 			else{
-				if(current == parent->right_child){
-					current = parent;
+				if(current == current->parent->right_child){
+					current = current->parent;
 					leftRotation(current);
 				}
-				parent->color = COLOR_BLACK;
-				grand_parent->color = COLOR_RED;
-				rightRotation(grand_parent);
+				current->parent->color = COLOR_BLACK;
+				current->parent->parent->color = COLOR_RED;
+				rightRotation(current->parent->parent);
 			}
 		}
 		else{
-			uncle = parent->parent->left_child;
+			uncle = current->parent->parent->left_child;
 			if (uncle->color == COLOR_RED){
-				parent->color = COLOR_BLACK;
+				current->parent->color = COLOR_BLACK;
 				uncle->color = COLOR_BLACK;
-				grand_parent->color = COLOR_RED;
-				current = grand_parent;
+				current->parent->parent->color = COLOR_RED;
+				current = current->parent->parent;
 			}
 			else{
-				if (current = parent->left_child){
-					current = parent;
+				if (current == current->parent->left_child){
+					current = current->parent;
 					rightRotation(current);
 				}
-				parent->color = COLOR_BLACK;
-				grand_parent->color = COLOR_RED;
-				leftRotation(grand_parent);
+				current->parent->color = COLOR_BLACK;
+				current->parent->parent->color = COLOR_RED;
+				leftRotation(current->parent->parent);
 			}
 		}
 
-		parent = current->parent;
-		grand_parent = parent->parent;
 	}	
 	root->color = COLOR_BLACK;
 }
