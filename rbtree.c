@@ -224,7 +224,8 @@ int insertNode(int key, char* data){
 
 int deleteNode(int key){
 	struct node* del_node = searchNode(key);
-	struct node* fetch_up = &nil;
+	struct node* current = NULL;
+	struct node* substitute = NULL;
 	struct node* left_child = del_node->left_child;
 	struct node* right_child = del_node->right_child;
 
@@ -232,35 +233,32 @@ int deleteNode(int key){
 		if (left_child != &nil && right_child != &nil){
 			//In this situation, one can either choose to go left or right at first step.
 			//We go right here.
-			while(right_child->left_child != &nil)
-				right_child = right_child->left_child;
+			current = right_child;
+			//Then we go left to find the best 
+			while(current->left_child != &nil)
+				current = current->left_child;
 			//Copy the key & data from subtitute to del_node.
-			del_node->key = right_child->key;
-			del_node->data = right_child->data;
-			//Tree links to the leaf.
-			*parentChildCheck(right_child) = right_child->right_child;
-			//Leaf links back to the tree.
-			right_child->right_child->parent = right_child->parent;
-			//Exchange and let the substitute go to hell.
-			del_node = right_child;
-			fetch_up = right_child->right_child;
+			del_node->key = current->key;
+			del_node->data = current->data;
+			//Renew the left_child & right_child
+			left_child = current->left_child;
+			right_child = current->right_child;
+			//Move the del_node to current.
+			del_node = current;
 		}
-		else if (left_child != &nil){
+		if (left_child != &nil){ //Only have left_child.
 			*parentChildCheck(del_node) = left_child;
 			left_child->parent = del_node->parent;
-			fetch_up = left_child;
+			substitute = left_child;
 		}
-		else if (right_child != &nil){
+		else{//Including only have right_child & have no child.
 			*parentChildCheck(del_node) = right_child;
 			right_child->parent = del_node->parent;
-			fetch_up = right_child;
-		}
-		else{
-			*parentChildCheck(del_node) = &nil;
+			substitute = right_child;
 		}
 
 		if (del_node->color == COLOR_BLACK)
-			deleteFixUp(fetch_up);
+			deleteFixUp(substitute);
 
 		free(del_node);
 	}
