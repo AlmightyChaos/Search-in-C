@@ -1,20 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#define COLOR_RED 'r'
-#define COLOR_BLACK 'b'
-#define QUEUE_SIZE 1024
-
-typedef enum{
-	false = 0,
-	true = 1
-} bool;
-
-struct node{
-	char color;
-	int key;
-	char* data;
-	struct node *left_child, *right_child, *parent;	
-};
+#include "rbtree.h"
 
 struct node nil={
 	.color = COLOR_BLACK,
@@ -28,43 +14,6 @@ struct node *queue[QUEUE_SIZE];
 int front = QUEUE_SIZE - 1;
 int rear = QUEUE_SIZE - 1;
 bool full = false;
-bool enqueue(struct node*);
-bool dequeue(struct node**);
-
-int insertNode(int, char*);
-int deleteNode(int);
-struct node* searchNode(int);
-struct node** parentChildCheck(struct node*);
-void leftRotation(struct node *);
-void rightRotation(struct node *);
-void insertFixUp(struct node*);
-void deleteFixUp(struct node*);
-void levelOrderTraversal();
-
-int main(){
-	insertNode(5, "faker");
-	insertNode(10, "nick");
-	insertNode(2, "fuick");
-	insertNode(8, "fffnick");
-	insertNode(12, "nickfdf");
-	insertNode(4, "nic2223k");
-	insertNode(1, "ni34ck");
-	insertNode(13, "ytyty77");
-	insertNode(7, "ytydsfs");
-	insertNode(15, "yt535sfs");
-	insertNode(14, "ytyty43");
-	//rightRotation(root);
-	deleteNode(13);
-	levelOrderTraversal();
-	//printf("%s\n", searchNode(10)->data);
-	//printf("%ld\n", (root->right_child));
-	//printf("%ld\n", *(struct node **)((void*)root+24));
-	//*(struct node**)((void*)root+24) = root;
-	//printf("%ld\n", *parentChildCheck(root));
-	//printf("%ld\n", root);
-	return 0;
-}
-
 void insertFixUp(struct node* current){
 	struct node* uncle = NULL;
 
@@ -231,27 +180,27 @@ int deleteNode(int key){
 
 	if (del_node != NULL){
 		if (left_child != &nil && right_child != &nil){
-			//In this situation, one can either choose to go left or right at first step.
-			//We go right here.
+			/*In this situation, one can either choose to go left or right at first step.
+			We go right here.*/
 			current = right_child;
-			//Then we go left to find the best 
+			/*Then we go left to find the best*/
 			while(current->left_child != &nil)
 				current = current->left_child;
-			//Copy the key & data from subtitute to del_node.
+			/*Copy the key & data from subtitute to del_node.*/
 			del_node->key = current->key;
 			del_node->data = current->data;
-			//Renew the left_child & right_child
+			/*Renew the left_child & right_child*/
 			left_child = current->left_child;
 			right_child = current->right_child;
-			//Move the del_node to current.
+			/*Move the del_node to current.*/
 			del_node = current;
 		}
-		if (left_child != &nil){ //Only have left_child.
+		if (left_child != &nil){ /*Only have left_child.*/
 			*parentChildCheck(del_node) = left_child;
 			left_child->parent = del_node->parent;
 			substitute = left_child;
 		}
-		else{//Including only have right_child & have no child.
+		else{/*Including only have right_child & have no child.*/
 			*parentChildCheck(del_node) = right_child;
 			right_child->parent = del_node->parent;
 			substitute = right_child;
