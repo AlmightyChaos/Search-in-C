@@ -1,5 +1,5 @@
 #include "rbtree.h"
-int main(){
+int main(void){
 	insertNode(5, "faker");
 	insertNode(10, "nick");
 	insertNode(2, "fuick");
