@@ -25,12 +25,21 @@ unsigned int stringPreHash(char* string){
 	while(*pos != '\0')
 		h += (unsigned int)(*(pos++));
 	return h;
-		//printf("%c\n", *(pos++));
+	//printf("%c\n", *(pos++));
 }
 
-void hashCRC(){
+void hashCRC(char* string, unsigned int m){
+	unsigned int h = 0;
+	unsigned int highorder;
+	char* pos = string;
 
-
+	while(*pos != '\0'){
+		highorder = h & 0xF8000000UL;
+		h = h << 5;
+		h = h ^ (highorder >> 27);
+		h = h ^ (unsigned int)(*(pos++));
+	}
+	printf("%u\n", h%m);
 }
 
 void hashMulMethod(){
@@ -60,6 +69,6 @@ void tranToList(){
 
 int main(){
 	hashInit(3);
-	printf("%u\n", stringPreHash("dfg"));
+	hashCRC("ek", 100);
 	return 0;
 }
