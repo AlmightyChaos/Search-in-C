@@ -1,14 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stddef.h>
 #include "hash.h"
-struct hash_list *hash_table;
+#define GOLDEN_RATIO_PRIME_32 0x9e370001UL
 
-void hashInit(unsigned int bits){
+void hashInit(struct hash_list *hash_table, unsigned int bits){
 	hash_table = (struct hash_list *)malloc(sizeof(struct hash_list *)*bits);
 }
 
-void hashAdd(){
-
+void hashAdd(void *input, unsigned int bits){
+	
 }
 
 void hashDel(){
@@ -19,16 +20,15 @@ void hashSearch(){
 
 }
 
-unsigned int stringPreHash(char* string){
-	char* pos = string;
+unsigned int stringPreHash(void* string){
+	char* pos = (char*)string;
 	unsigned int h = 0;
 	while(*pos != '\0')
 		h += (unsigned int)(*(pos++));
 	return h;
-	//printf("%c\n", *(pos++));
 }
 
-void hashCRC(char* string, unsigned int m){
+unsigned int hashCRC(char* string, unsigned int bits){
 	unsigned int h = 0;
 	unsigned int highorder;
 	char* pos = string;
@@ -39,12 +39,12 @@ void hashCRC(char* string, unsigned int m){
 		h = h ^ (highorder >> 27);
 		h = h ^ (unsigned int)(*(pos++));
 	}
-	printf("%u\n", h%m);
+	return h%(2<<bits);
 }
 
-void hashMulMethod(){
-
-
+unsigned int hashMulMethod(unsigned int value, unsigned int bits){
+	unsigned int hash = value * GOLDEN_RATIO_PRIME_32;
+	return hash >> (32 - bits);
 }
 
 void chaining(){
@@ -68,7 +68,13 @@ void tranToList(){
 }
 
 int main(){
-	hashInit(3);
-	hashCRC("ek", 100);
+	unsigned int bits = 10;
+	struct hash_list *hash_table;
+	hashInit(hash_table, bits);
+	hashAdd((void*)3, bits);
+	//hashCRC("ek", 100);
+	//printf("%u\n", hashMulMethod(100, 3));
+	printf("%ld\n", offsetof(struct hash_list, key));
+	printf("%ld\n", (size_t) &bits);
 	return 0;
 }

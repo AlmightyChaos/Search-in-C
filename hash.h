@@ -1,7 +1,13 @@
+struct hash_head {
+	struct hash_node *next;
+};
 
+struct hash_node {
+	struct hash_node **pprev, *next;
+};
 
 struct hash_list {
-	char* data;
+	char* key;
 	int value;	
-	struct hash_list *prev, *next;
+	struct hash_node node;
 };
