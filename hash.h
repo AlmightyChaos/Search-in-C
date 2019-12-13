@@ -1,5 +1,5 @@
 struct hash_head {
-	struct hash_node *next;
+	struct hash_node *first;
 };
 
 struct hash_node {

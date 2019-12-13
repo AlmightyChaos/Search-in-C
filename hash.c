@@ -2,11 +2,10 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include "hash.h"
-#define GOLDEN_RATIO_PRIME_32 0x9e370001UL
+#define HASH_SIZE(bits) (1<<bits)
+#define GOLDEN_RATIO_PRIME_32 0x9e370001U
+#define DEFINE_HASHTABLE(name,bits) struct hash_head name[HASH_SIZE(bits)];
 
-void hashInit(struct hash_list *hash_table, unsigned int bits){
-	hash_table = (struct hash_list *)malloc(sizeof(struct hash_list *)*bits);
-}
 
 void hashAdd(void *input, unsigned int bits){
 	
@@ -70,11 +69,13 @@ void tranToList(){
 int main(){
 	unsigned int bits = 10;
 	struct hash_list *hash_table;
-	hashInit(hash_table, bits);
+	//hashInit(hash_table, bits);
 	hashAdd((void*)3, bits);
 	//hashCRC("ek", 100);
 	//printf("%u\n", hashMulMethod(100, 3));
 	printf("%ld\n", offsetof(struct hash_list, key));
 	printf("%ld\n", (size_t) &bits);
+	DEFINE_HASHTABLE(bax, 3);
+	printf("%ld\n", &(((struct hash_list *)0)->value));
 	return 0;
 }
